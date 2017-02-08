@@ -594,6 +594,101 @@ module BingAdsApi
 			return response_hash
 		end
 
+		# Public : Adds one or more ad extensions to an account’s ad extension library.
+		#
+		# Author:: ricky@tenjin.io
+		#
+		# === Parameters
+		# account_id - The identifier of the account to add the extensions to.
+		# ad_extensions - Array[BingAdsApi::AdExtension] The array of ad extensions of any type to add to the account.
+		#
+		# === Examples
+		#   service.add_ad_extensions(1, [<BingAdsApi::AdExtensions>])
+		#   # => <Array>
+		#
+		# Returns:: Array of AdExtension ids
+		#
+		# Raises:: exception
+		def add_ad_extensions(account_id, ad_extensions)
+			exts = ad_extensions.map{ |gr| gr.to_hash(:camelcase) }
+			message = {
+					:account_id => account_id,
+					:ad_extensions => {:ad_extension => exts} }
+			response = call(:add_ad_extensions, message)
+			response_hash = get_response_hash(response, __method__)
+			identities = response_hash[:ad_extension_identities][:ad_extension_identity]
+			if identities.is_a? Array
+				identities.map { |d| d[:id] }
+			elsif identities.is_a? Hash
+				[ identities[:id] ]
+			end
+		end
+
+		# Public : Gets the ad extensions from the account’s ad extension library.
+		#
+		# Author:: ricky@tenjin.io
+		#
+		# === Parameters
+		# account_id - The identifier of the account that contains the ad extensions to get.
+		#
+		# === Examples
+		#   campaign_management_service.get_ad_extensions_by_account_id(1, BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+		#   # => Array[int]
+		#
+		# Returns:: Array of AdExtension ids
+		#
+		# Raises:: exception
+		def get_ad_extension_ids_by_account_id(account_id, ad_extension_type, association_type = nil)
+			response = call(:get_ad_extension_ids_by_account_id,
+											{ account_id: account_id,
+												ad_extension_type: ad_extension_type,
+												association_type: association_type
+											})
+			response_hash = get_response_hash(response, __method__)
+			ids = response_hash[:ad_extension_ids][:long]
+			case ids
+				when String
+					[ids]
+				when nil
+					[]
+				else
+					ids
+			end
+		end
+
+		# Public : Gets the specified ad extensions from the account’s ad extension library.
+		#
+		# === Parameters
+		# account_id - The identifier of the account that owns the ad extensions.
+		# ad_extension_ids - An array of ad extension identifiers.
+		# ad_extension_type - The types of ad extensions that the list of identifiers contains.
+		#
+		# === Examples
+		#   campaign_management_service.get_ad_extensions_by_ids(1, [1,2,3], BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+		#   # => Array[BingAdsApi::AppAdExtension]
+		#
+		# Returns:: Array of BingAdsApi::AdExtension
+		#
+		# Raises:: exception
+		def get_ad_extensions_by_ids(account_id, ad_extension_ids, ad_extension_type)
+			response = call(:get_ad_extensions_by_ids,
+											{ account_id: account_id,
+												ad_extension_ids: { "ins1:long" => ad_extension_ids },
+												ad_extension_type: ad_extension_type
+											})
+			response_hash = get_response_hash(response, __method__)
+			response_hash[:ad_extensions][:ad_extension].map do |info|
+				initialize_ad_extension(info)
+			end
+		end
+
+		def delete_ad_extensions(account_id, ad_extension_ids)
+			response = call(:delete_ad_extensions,
+											{ account_id: account_id,
+											ad_extension_ids: { "ins1:long" => ad_extension_ids }})
+			get_response_hash(response, __method__)
+		end
+
 		private
 			def get_service_name
 				"campaign_management"
@@ -626,6 +721,15 @@ module BingAdsApi
 					ad = BingAdsApi::ProductAd.new(ad_hash)
 				end
 				return ad
+			end
+
+			def initialize_ad_extension(ad_extension_hash)
+				case ad_extension_hash[:'@i:type']
+					when 'AppAdExtension'
+						BingAdsApi::AppAdExtension.new(ad_extension_hash)
+					else
+						BingAdsApi::AdExtension.new(ad_extension_hash)
+				end
 			end
 	end
 

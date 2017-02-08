@@ -35,6 +35,18 @@ class BingAdsFactory
     response[:ad_group_ids][:long]
   end
 
+  def self.create_app_ad_extension(size=1)
+    ad_extensions = []
+    size.times do |i|
+      ad_extensions << BingAdsApi::AppAdExtension.new(
+          app_platform: 'iOS',
+          app_store_id: (12345678 + i).to_s,
+          destination_url: "https://track.domain.com/trackingid#{i}",
+          display_text: "my ios app tracking link #{i}")
+    end
+    service.add_ad_extensions(account_id, ad_extensions)
+  end
+
   # Helper method to create an ad on the remote API. Returns the created ad id.
   def self.create_text_ad(ad_group_id)
     text_ad = BingAdsApi::TextAd.new(

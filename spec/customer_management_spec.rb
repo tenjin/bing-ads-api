@@ -27,4 +27,22 @@ describe BingAdsApi::CustomerManagement do
 		expect(response).to be_kind_of(Array)
 	end
 
+	it "should find accounts or customers info" do
+		response = service.find_accounts_or_customers_info
+		expect(response).not_to be_nil
+		expect(response).to be_kind_of(Array)
+		expect(response.size).to eq 1
+		expect(response[0].customer_id).to eq default_options[:customer_id]
+		expect(response[0].account_id).to eq default_options[:account_id]
+	end
+
+	it "should find accounts or customers info, with nils" do
+		response = service.find_accounts_or_customers_info(nil, 1, nil)
+		expect(response).not_to be_nil
+		expect(response).to be_kind_of(Array)
+		expect(response.size).to eq 1
+		expect(response[0].customer_id).to eq default_options[:customer_id]
+		expect(response[0].account_id).to eq default_options[:account_id]
+	end
+
 end

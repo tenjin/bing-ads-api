@@ -72,6 +72,31 @@ module BingAdsApi
 			return accounts
 		end
 
+		# Public : Gets a list of the accounts and customers that match the specified filter criteria.
+		#
+		# Author:: ricky@tenjin.io
+		#
+		# === Parameters
+		# +filter+ - the criteria to use to filter the list of accounts and customers
+		# +top_n+ - the number of accounts to return, from 1 to 5000
+		# +application_type+ - 'Advertiser' or nil
+		#
+		# Returns:: Array of BingAdsApi::AccountInfoWithCustomerData
+		#
+		# Raises:: exception
+		def find_accounts_or_customers_info(filter='', top_n=1, application_type=BingAdsApi::ApplicationType::ADVERTISER)
+			response = call(:find_accounts_or_customers_info,
+											{filter: filter, top_n: top_n, application_scope: application_type})
+			response_hash = get_response_hash(response, __method__)
+			data = response_hash[:account_info_with_customer_data][:account_info_with_customer_data]
+			if data.is_a? Hash
+				[BingAdsApi::AccountInfoWithCustomerData.new(data)]
+			elsif data.is_a? Array
+				data.map do |hash|
+					BingAdsApi::AccountInfoWithCustomerData.new(hash)
+				end
+			end
+		end
 
 		private
 			def get_service_name

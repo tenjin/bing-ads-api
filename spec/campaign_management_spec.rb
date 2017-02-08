@@ -421,4 +421,64 @@ describe BingAdsApi::CampaignManagement do
 
 		end
 	end
+
+	describe "ad extension operations" do
+		before :each do
+			ids = service.get_ad_extension_ids_by_account_id(
+					default_options[:account_id],
+					BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+			unless ids.empty?
+				service.delete_ad_extensions(default_options[:account_id], ids)
+			end
+		end
+
+		it "should add one ad extension" do
+			ids = BingAdsFactory.create_app_ad_extension
+			expect(ids.size).to eq 1
+		end
+
+		it "should add multiple ad extension" do
+			ids = BingAdsFactory.create_app_ad_extension(3)
+			expect(ids.size).to eq 3
+		end
+
+		it "should get ad extension ids by account id" do
+			ids_created = BingAdsFactory.create_app_ad_extension
+			ids_get = service.get_ad_extension_ids_by_account_id(
+					default_options[:account_id],
+					BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+			expect(ids_get.size).to eq 1
+			expect(ids_get).to eq ids_created
+		end
+
+		it "should get ad extension ids by account id with association type" do
+			ids = service.get_ad_extension_ids_by_account_id(
+					default_options[:account_id],
+					BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+					BingAdsApi::AssociationType::AD_GROUP
+			)
+			expect(ids).to be_empty
+		end
+
+		it "should get ad extensions by ids" do
+			ids = BingAdsFactory.create_app_ad_extension 2
+			exts = service.get_ad_extensions_by_ids(
+					default_options[:account_id],
+					ids,
+					BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+			expect(exts.size).to eq 2
+			expect(exts[0]).to be_a BingAdsApi::AdExtension
+			expect(exts[0]).to be_a BingAdsApi::AppAdExtension
+		end
+
+		it "should delete ad extensions" do
+			ids = BingAdsFactory.create_app_ad_extension
+			service.delete_ad_extensions(default_options[:account_id], ids)
+			sleep 1
+			ids = service.get_ad_extension_ids_by_account_id(
+					default_options[:account_id],
+					BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
+			expect(ids).to be_empty
+		end
+	end
 end

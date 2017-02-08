@@ -81,6 +81,8 @@ module BingAdsApi
 						else value
 					end
 					hash[get_attribute_key(var, keys_case)] = hashed_value
+				else
+					hash[get_attribute_key(var, keys_case)] = nil
 				end
 			end
 			return hash

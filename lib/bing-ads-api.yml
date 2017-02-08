@@ -241,6 +241,15 @@ constants:
       content: 'Content'
       exact: 'Exact'
       phrase: 'Phrase'
+    ad_extension_status:
+      active: 'Active'
+      deleted: 'Deleted'
+    ad_extension_type:
+      app_ad_extension: 'AppAdExtension'
+    association_type:
+      campaign: 'Campaign'
+      ad_group: 'AdGroup'
+      account: 'Account'
   # Constants specific for customer management
   customer_management:
     account_life_cycle_statuses:
@@ -249,6 +258,8 @@ constants:
       inactive: "Inactive"
       pause: "Pause"
       pending: "Pending"
+    application_type:
+      advertiser: 'Advertiser'
   # Constants specific for reporting services
   reporting:
     format:
@@ -622,6 +633,18 @@ orders:
       - display_url
       - text
       - title
+    ad_extension:
+      - forward_compatibility_map
+      - id
+      - scheduling
+      - status
+      - type
+    app_ad_extension:
+      - app_platform
+      - app_store_id
+      - destination_url
+      - device_preference
+      - display_text
   reporting:
     report_request:
       - format
