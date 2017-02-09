@@ -43,6 +43,18 @@ describe BingAdsApi::CustomerManagement do
 		expect(response.size).to eq 1
 		expect(response[0].customer_id).to eq default_options[:customer_id]
 		expect(response[0].account_id).to eq default_options[:account_id]
+  end
+
+	it "should find accounts or customers info, without customer_id/account_id header" do
+    cust_id = default_options.delete(:customer_id)
+		acct_id = default_options.delete(:account_id)
+		service = BingAdsApi::CustomerManagement.new(default_options)
+		response = service.find_accounts_or_customers_info
+		expect(response).not_to be_nil
+		expect(response).to be_kind_of(Array)
+		expect(response.size).to eq 1
+		expect(response[0].customer_id).to eq cust_id
+		expect(response[0].account_id).to eq acct_id
 	end
 
 end

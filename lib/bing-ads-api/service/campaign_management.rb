@@ -616,11 +616,9 @@ module BingAdsApi
 					:ad_extensions => {:ad_extension => exts} }
 			response = call(:add_ad_extensions, message)
 			response_hash = get_response_hash(response, __method__)
-			identities = response_hash[:ad_extension_identities][:ad_extension_identity]
-			if identities.is_a? Array
-				identities.map { |d| d[:id] }
-			elsif identities.is_a? Hash
-				[ identities[:id] ]
+			data = response_hash[:ad_extension_identities][:ad_extension_identity]
+			instantiate_as_array(data) do |d|
+				d[:id]
 			end
 		end
 
@@ -680,6 +678,66 @@ module BingAdsApi
 			response_hash[:ad_extensions][:ad_extension].map do |info|
 				initialize_ad_extension(info)
 			end
+    end
+
+		# Public : Associates the specified ad extensions with the respective campaigns or ad groups.
+		#
+		# === Parameters
+		# account_id - The identifier of the account that owns the extensions.
+		# association_type - The type of all entities specified.
+		# extension_entity_pairs - Array of pairs of [ extension_id, entity_id ]
+		#
+		# === Examples
+		#   campaign_management_service.set_ad_extensions_associations(1, BingAdsApi::AssociationType::AD_GROUP, [ [ 123, 321 ] ])
+		def set_ad_extensions_associations(account_id, association_type, extension_entity_pairs)
+			response = call(:set_ad_extensions_associations,
+											{ account_id: account_id,
+												ad_extension_id_to_entity_id_associations: {
+														ad_extension_id_to_entity_id_association:
+																extension_entity_pairs.map do |ext_id, ent_id|
+                                  { ad_extension_id: ext_id, entity_id: ent_id }
+																end
+												},
+												association_type: association_type
+											})
+      get_response_hash(response, __method__)
+		end
+
+    # Public : Gets the respective ad extension associations by the specified campaign and ad group identifiers.
+		#
+		# === Parameters
+		# account_id - The identifier of the account that owns the extensions.
+		# ad_extension_type - Filters the returned associations by ad extension type.
+		# association_type - Filters the returned associations by entity type.
+		# entity_ids - The list of entity identifiers by which you may request the respective ad extension associations.
+		#
+		# === Examples
+		#  service.get_ad_extensions_associations(
+		#     default_options[:account_id],
+		# 		BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+		# 		BingAdsApi::AssociationType::AD_GROUP,
+		#     [ ad_group_id, 999 ])
+		#  # => Array[Array[BingAdsApi::AdExtensionAssociation]]
+		#
+		# Returns:: An array, each item is an Array[AdExtensionAssociation] corresponding to each entity ID requested.
+		#
+		# Raises:: exception
+		def get_ad_extensions_associations(account_id, ad_extension_type, association_type, entity_ids)
+			response = call(:get_ad_extensions_associations,
+											{ account_id: account_id,
+												ad_extension_type: ad_extension_type,
+                        association_type: association_type,
+												entity_ids: { "ins1:long" => entity_ids }})
+      response_hash = get_response_hash(response, __method__)
+			collection = response_hash[:ad_extension_association_collection][:ad_extension_association_collection]
+
+			instantiate_as_array(collection) do |c|
+				instantiate_as_array(c[:ad_extension_associations][:ad_extension_association]) do |assn|
+					ext_hash = assn[:ad_extension]
+					assn[:ad_extension] = initialize_ad_extension(ext_hash)
+					BingAdsApi::AdExtensionAssociation.new(assn)
+				end
+			end
 		end
 
 		def delete_ad_extensions(account_id, ad_extension_ids)
@@ -729,6 +787,16 @@ module BingAdsApi
 						BingAdsApi::AppAdExtension.new(ad_extension_hash)
 					else
 						BingAdsApi::AdExtension.new(ad_extension_hash)
+				end
+			end
+
+			def instantiate_as_array(data, &block)
+				if data.is_a? Hash
+					data.nil? ? [] : [ yield(data) ]
+				elsif data.is_a? Array
+					data.map do |hash|
+						hash.nil? ? nil : yield(hash)
+					end
 				end
 			end
 	end

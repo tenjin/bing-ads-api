@@ -1,5 +1,6 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
+require 'httplog'
 
 # Author:: jlopezn@neonline.cl
 describe BingAdsApi::CampaignManagement do
@@ -469,9 +470,9 @@ describe BingAdsApi::CampaignManagement do
 			expect(exts.size).to eq 2
 			expect(exts[0]).to be_a BingAdsApi::AdExtension
 			expect(exts[0]).to be_a BingAdsApi::AppAdExtension
-		end
+    end
 
-		it "should delete ad extensions" do
+    it "should delete ad extensions" do
 			ids = BingAdsFactory.create_app_ad_extension
 			service.delete_ad_extensions(default_options[:account_id], ids)
 			sleep 1
@@ -479,6 +480,64 @@ describe BingAdsApi::CampaignManagement do
 					default_options[:account_id],
 					BingAdsApi::AdExtensionType::APP_AD_EXTENSION)
 			expect(ids).to be_empty
-		end
+    end
+
+    context "ad extension associations" do
+      let(:extension_id) {
+        BingAdsFactory.create_app_ad_extension.first
+      }
+      let(:campaign_id) {
+				BingAdsFactory.create_campaign
+      }
+      let(:ad_group_id) {
+			  BingAdsFactory.create_ad_group(campaign_id)
+      }
+
+      it "should set ad extension association" do
+        exts = service.set_ad_extensions_associations(default_options[:account_id],
+                                                      BingAdsApi::AssociationType::AD_GROUP,
+                                                      [ [ extension_id, ad_group_id ] ])
+        expect(exts).to_not be_nil
+      end
+
+      it "should get ad extension associations for one entity" do
+        service.set_ad_extensions_associations(default_options[:account_id],
+                                               BingAdsApi::AssociationType::AD_GROUP,
+                                               [ [ extension_id, ad_group_id ] ])
+        result = service.get_ad_extensions_associations(
+            default_options[:account_id],
+            BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+            BingAdsApi::AssociationType::AD_GROUP,
+            [ ad_group_id ])
+
+        expect(result.size).to eq 1
+				expect(result.first).to be_a(Array)
+				expect(result.first.size).to eq 1
+				expect(result.first.first).to be_a(BingAdsApi::AdExtensionAssociation)
+				expect(result.first.first.ad_extension).to be_a(BingAdsApi::AdExtension)
+				expect(result.first.first.ad_extension.id).to eq extension_id
+      end
+
+			it "should get ad extension associations for multiple entities" do
+				service.set_ad_extensions_associations(default_options[:account_id],
+																							 BingAdsApi::AssociationType::AD_GROUP,
+																							 [ [ extension_id, ad_group_id ] ])
+				result = service.get_ad_extensions_associations(
+						default_options[:account_id],
+						BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+						BingAdsApi::AssociationType::AD_GROUP,
+						[ ad_group_id, 999 ])
+
+				expect(result.size).to eq 2
+				expect(result.first).to be_a(Array)
+				expect(result.first.size).to eq 1
+				expect(result.first.first).to be_a(BingAdsApi::AdExtensionAssociation)
+				expect(result.first.first.ad_extension).to be_a(BingAdsApi::AdExtension)
+				expect(result.first.first.ad_extension.id).to eq extension_id
+				expect(result.last).to be_nil
+			end
+    end
+
+
 	end
 end
