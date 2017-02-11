@@ -14,6 +14,7 @@ require 'bing-ads-api/data_object'
 Dir[File.join(File.dirname(__FILE__), 'bing-ads-api', 'service', '*.rb')].each { |file| require file }
 
 # Require data objects
+require 'bing-ads-api/data/ad_extension'
 Dir[File.join(File.dirname(__FILE__), 'bing-ads-api', 'data', '*.rb')].each { |file| require file }
 
 # Require bulk data objects
