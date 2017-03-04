@@ -732,10 +732,14 @@ module BingAdsApi
 			collection = response_hash[:ad_extension_association_collection][:ad_extension_association_collection]
 
 			instantiate_as_array(collection) do |c|
-				instantiate_as_array(c[:ad_extension_associations][:ad_extension_association]) do |assn|
-					ext_hash = assn[:ad_extension]
-					assn[:ad_extension] = initialize_ad_extension(ext_hash)
-					BingAdsApi::AdExtensionAssociation.new(assn)
+				if c[:ad_extension_associations].nil?
+					[]
+				else
+					instantiate_as_array(c[:ad_extension_associations][:ad_extension_association]) do |assn|
+						ext_hash = assn[:ad_extension]
+						assn[:ad_extension] = initialize_ad_extension(ext_hash)
+						BingAdsApi::AdExtensionAssociation.new(assn)
+					end
 				end
 			end
 		end

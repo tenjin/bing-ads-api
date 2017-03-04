@@ -535,7 +535,23 @@ describe BingAdsApi::CampaignManagement do
 				expect(result.first.first.ad_extension).to be_a(BingAdsApi::AdExtension)
 				expect(result.first.first.ad_extension.id).to eq extension_id
 				expect(result.last).to be_nil
-			end
+      end
+
+      it "should get empty ad extension associations" do
+				result = service.get_ad_extensions_associations(
+						default_options[:account_id],
+						BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+						BingAdsApi::AssociationType::AD_GROUP,
+						[ ad_group_id ])
+        expect(result).to eq [ [] ]
+
+				result = service.get_ad_extensions_associations(
+						default_options[:account_id],
+						BingAdsApi::AdExtensionType::APP_AD_EXTENSION,
+						BingAdsApi::AssociationType::AD_GROUP,
+						[ ad_group_id, 999 ])
+				expect(result).to eq [ [], nil ]
+      end
     end
 
 
