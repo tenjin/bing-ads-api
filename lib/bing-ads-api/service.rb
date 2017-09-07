@@ -48,12 +48,13 @@ module BingAdsApi
 
 			# ClientProxy settings
 			clientProxySettings = {
+				:authentication_token => options[:authentication_token],
 				:username => options[:username],
 				:password => options[:password],
 				:developer_token => options[:developer_token],
 				:account_id => options[:account_id],
 				:customer_id => options[:customer_id],
-				:wsdl_url => options[:wdsl] || solve_wsdl_url
+				:wsdl_url => options[:wsdl] || solve_wsdl_url
 			}
 
 			# Additionsl ClientProxy settings
@@ -91,7 +92,6 @@ module BingAdsApi
 				LOGGER.debug "   Message: #{message}"
 				response = self.client_proxy.call(operation.to_sym,
 					message: message)
-
 				LOGGER.debug "response header:"
 				LOGGER.debug "\t#{response.header}"
 
