@@ -32,7 +32,7 @@ describe BingAdsApi::Reporting do
 				:account_name, :account_number, :time_period,
 				:campaign_name, :campaign_id, :status, :currency_code,
 				:impressions, :clicks, :ctr, :average_cpc, :spend,
-				:conversions, :conversion_rate, :cost_per_conversion, :average_cpm
+				:conversions, :conversion_rate, :cost_per_conversion
 			],
 			:filter => {
 				# String as bing expected
@@ -110,8 +110,8 @@ describe BingAdsApi::Reporting do
 			:aggregation => :hourly,
 			:columns => [
 				:account_name, :account_number, :time_period,
-				:currency_code, :impressions, :clicks, :ctr, :average_cpc, :spend,
-				:conversions, :cost_per_conversion, :average_cpm
+				:currency_code, :impressions, :clicks, :ctr, :average_cpc,
+				:spend, :conversions, :cost_per_conversion
 			],
 			:filter => {
 				# String as bing expected
@@ -154,8 +154,8 @@ describe BingAdsApi::Reporting do
 				:aggregation => :hourly,
 				:columns => [
 					:account_name, :account_number, :time_period,
-					:currency_code, :impressions, :clicks, :ctr, :average_cpc, :spend,
-					:conversions, :cost_per_conversion, :average_cpm
+					:currency_code, :impressions, :clicks, :ctr, :average_cpc,
+					:spend, :conversions, :cost_per_conversion
 				],
 				:filter => {
 					# String as bing expected
