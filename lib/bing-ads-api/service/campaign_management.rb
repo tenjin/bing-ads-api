@@ -156,7 +156,7 @@ module BingAdsApi
 		def delete_campaigns(account_id, campaign_ids)
 			message = {
 				:account_id => account_id,
-				:campaign_ids => {"ins1:long" => campaign_ids}
+				:campaign_ids => {"ins0:long" => campaign_ids}
 			}
 			response = call(:delete_campaigns, message)
 			return get_response_hash(response, __method__)
@@ -210,7 +210,7 @@ module BingAdsApi
 
 			message = {
 				:campaign_id => campaign_id,
-				:ad_group_ids => {"ins1:long" => ad_groups_ids} }
+				:ad_group_ids => {"ins0:long" => ad_groups_ids} }
 			response = call(:get_ad_groups_by_ids, message)
 			response_hash = get_response_hash(response, __method__)
 			response_ad_groups = [response_hash[:ad_groups][:ad_group]].flatten
@@ -330,7 +330,7 @@ module BingAdsApi
 
 			message = {
 				:ad_group_id => ad_group_id,
-				:ad_ids => {"ins1:long" => ad_ids} }
+				:ad_ids => {"ins0:long" => ad_ids} }
 			response = call(:get_ads_by_ids, message)
 			response_hash = get_response_hash(response, __method__)
 
@@ -488,7 +488,7 @@ module BingAdsApi
 		def get_keywords_by_ids(ad_group_id, keyword_ids)
 			message = {
 				:ad_group_id => ad_group_id,
-				:keyword_ids => {"ins1:long" => keyword_ids} }
+				:keyword_ids => {"ins0:long" => keyword_ids} }
 			response = call(:get_keywords_by_ids, message)
 			response_hash = get_response_hash(response, __method__)
 			response_keywords = [response_hash[:keywords][:keyword]].flatten
@@ -671,7 +671,7 @@ module BingAdsApi
 		def get_ad_extensions_by_ids(account_id, ad_extension_ids, ad_extension_type)
 			response = call(:get_ad_extensions_by_ids,
 											{ account_id: account_id,
-												ad_extension_ids: { "ins1:long" => ad_extension_ids },
+												ad_extension_ids: { "ins0:long" => ad_extension_ids },
 												ad_extension_type: ad_extension_type
 											})
 			response_hash = get_response_hash(response, __method__)
@@ -727,7 +727,7 @@ module BingAdsApi
 											{ account_id: account_id,
 												ad_extension_type: ad_extension_type,
                         association_type: association_type,
-												entity_ids: { "ins1:long" => entity_ids }})
+												entity_ids: { "ins0:long" => entity_ids }})
       response_hash = get_response_hash(response, __method__)
 			collection = response_hash[:ad_extension_association_collection][:ad_extension_association_collection]
 
@@ -747,7 +747,7 @@ module BingAdsApi
 		def delete_ad_extensions(account_id, ad_extension_ids)
 			response = call(:delete_ad_extensions,
 											{ account_id: account_id,
-											ad_extension_ids: { "ins1:long" => ad_extension_ids }})
+											ad_extension_ids: { "ins0:long" => ad_extension_ids }})
 			get_response_hash(response, __method__)
 		end
 
